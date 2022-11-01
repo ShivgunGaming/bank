@@ -1,2 +1,2 @@
 # bank
-A bank contract showing how to use mappings.
+A Ethereum bank to store your ether coins.
