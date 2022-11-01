@@ -5,7 +5,7 @@ contract EtherBank {
     mapping (address => uint) balance; 
     address owner; 
     
-    event depositDone(uint amount, address depositedTo) ;
+    event depositFinished(uint amount, address depositedTo) ;
     event amountTransferred(uint amount, address toAddress, address fromAddress); //answer
     modifier onlyOwner {
         
@@ -20,7 +20,7 @@ contract EtherBank {
     function deposit() public payable returns (uint) {
         
         balance[msg.sender] += msg.value;
-        emit depositDone(msg.value, msg.sender);
+        emit depositFinished(msg.value, msg.sender);
         return balance[msg.sender];
     }
     
