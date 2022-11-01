@@ -1,6 +1,6 @@
 pragma solidity 0.8.7; 
 
-contract Bank {
+contract EtherBank {
     
     mapping (address => uint) balance; 
     address owner; 
