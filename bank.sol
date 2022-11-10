@@ -1,53 +1,45 @@
-pragma solidity 0.8.7; 
+pragma solidity 0.7.5;
+import "./Ownable.sol";
+import "./Destroyable.sol";
 
-contract EtherBank {
+contract Bank is Ownable, Destroyable {
     
-    mapping (address => uint) balance; 
-    address owner; 
+    mapping(address => uint) balance;
     
-    event depositFinished(uint amount, address depositedTo) ;
-    event amountTransferred(uint amount, address toAddress, address fromAddress); //answer
-    modifier onlyOwner {
-        
-        require(msg.sender == owner);
-        _; 
-    }
+    event depositDone(uint amount, address indexed depositedTo);
     
-    constructor() {
-        owner = msg.sender;
-    }
-    
-    function deposit() public payable returns (uint) {
-        
+    function deposit() public payable returns (uint)  {
         balance[msg.sender] += msg.value;
-        emit depositFinished(msg.value, msg.sender);
+        emit depositDone(msg.value, msg.sender);
         return balance[msg.sender];
     }
     
-    function getBalance() public view returns (uint) {
+    function withdraw(uint amount) public onlyOwner returns (uint){
+        require(balance[msg.sender] >= amount);
+        msg.sender.transfer(amount);
         return balance[msg.sender];
     }
     
-    function transfer(address recipient, uint amount) public payable {
-        
-        require(balance[msg.sender] >= amount, "Balance not Sufficient");
-        require(msg.sender != recipient, "Can't transfer money to yourself");
+    function getBalance() public view returns (uint){
+        return balance[msg.sender];
+    }
+    
+    function transfer(address recipient, uint amount) public {
+        require(balance[msg.sender] >= amount, "Balance not sufficient");
+        require(msg.sender != recipient, "Don't transfer money to yourself");
         
         uint previousSenderBalance = balance[msg.sender];
         
         _transfer(msg.sender, recipient, amount);
         
+        govermentInstance.addTransaction(msg.sender, recipient, amount);
+        
         assert(balance[msg.sender] == previousSenderBalance - amount);
-        
-        emit amountTransferred(amount, recipient, msg.sender); //answer
-        
     }
     
     function _transfer(address from, address to, uint amount) private {
-        
-        balance[from] -= amount; 
+        balance[from] -= amount;
         balance[to] += amount;
-        
     }
     
 }
